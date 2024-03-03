@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Accidentes de tráfico en Castilla y León</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<header>
+        <h1>Interfaces Gráficas y Entornos Virtuales: Dashboard de accidentalidad en Castilla y León</h1>
+    </header>
+	<div id="container">
+		<div id="menu-izquierda">
+			<p>Año</p>
+			<select id="anio" onchange="cambiarAnio()">
+				<option value="2022" selected>2022</option>
+				<option value="2021">2021</option>
+				<option value="2020">2020</option>
+				<option value="2019">2019</option>
+				<option value="2018">2018</option>
+				<option value="2017">2017</option>
+				<option value="2016">2016</option>
+			</select>
+			<p>Provincia</p>
+			<select id="provincia" onchange="cambiarProvincia()">
+				<option value="">Todas las provincias</option>
+				<option value="Ávila">Ávila</option>
+				<option value="Burgos">Burgos</option>
+				<option value="León">León</option>
+				<option value="Palencia">Palencia</option>
+				<option value="Salamanca">Salamanca</option>
+				<option value="Segovia">Segovia</option>
+				<option value="Soria">Soria</option>
+				<option value="Valladolid">Valladolid</option>
+				<option value="Zamora">Zamora</option>
+			</select>
+		</div>
+		<!-- <div id="mapa"></div> -->
+		<div id="map-container">
+			<div id="mapa"></div>
+		</div>
+		<div id="datos-derecha">
+			<p>Resumen de datos de accidentes</p>
+			<h2 id="numero-total"></h2>
+			<div id="grafico-barras">
+				<canvas id="barras-provincias" height="220"></canvas>
+			</div>
+		</div>
+  </div>
+
+  <script src="https://d3js.org/topojson.v1.min.js"></script>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- <script src="prueba_grafica.js"></script> -->
+  <!-- <script src="geojson.js"></script> -->
+  <script src="main.js"></script>
+</body>
+</html>
