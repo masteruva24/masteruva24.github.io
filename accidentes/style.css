@@ -13,6 +13,15 @@ header {
     padding: 20px;
 }
 
+/* Pie de página */
+footer {
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+  margin-top: auto;
+}
+
 #container {
 	display: flex;
 	flex-direction: row;
@@ -48,7 +57,17 @@ header {
 	margin-bottom: 10px;
 }
 
-#grafico-barras {
+#grafico-barras-provincias {
 	width: 100%;
 	height: 300px;
+}
+
+#grafico-barras-tred {
+	width: 100%;
+	height: 300px;
+}
+
+/* tooltip mapa */
+#titulo-tooltip{
+	font-weight: bold;
 }

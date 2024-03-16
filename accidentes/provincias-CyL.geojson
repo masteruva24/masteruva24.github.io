@@ -3743,7 +3743,8 @@
 				"cod_ccaa": "07",
 				"provincia": "Ávila",
 				"texto": "Ávila",
-				"codigo": "05"
+				"codigo": "05",
+				"orden": 0
 			}
 		},
 		{
@@ -7848,7 +7849,8 @@
 				"cod_ccaa": "07",
 				"provincia": "Palencia",
 				"texto": "Palencia",
-				"codigo": "34"
+				"codigo": "34",
+				"orden": 3
 			}
 		},
 		{
@@ -10701,7 +10703,8 @@
 				"cod_ccaa": "07",
 				"provincia": "Segovia",
 				"texto": "Segovia",
-				"codigo": "40"
+				"codigo": "40",
+				"orden": 5
 			}
 		},
 		{
@@ -14894,7 +14897,8 @@
 				"cod_ccaa": "07",
 				"provincia": "Zamora",
 				"texto": "Zamora",
-				"codigo": "49"
+				"codigo": "49",
+				"orden": 8
 			}
 		},
 		{
@@ -18371,7 +18375,8 @@
 				"cod_ccaa": "07",
 				"provincia": "Soria",
 				"texto": "Soria",
-				"codigo": "42"
+				"codigo": "42",
+				"orden": 6
 			}
 		},
 		{
@@ -23238,7 +23243,8 @@
 				"cod_ccaa": "07",
 				"provincia": "León",
 				"texto": "León",
-				"codigo": "24"
+				"codigo": "24",
+				"orden": 2
 			}
 		},
 		{
@@ -29811,7 +29817,8 @@
 				"cod_ccaa": "07",
 				"provincia": "Burgos",
 				"texto": "Burgos",
-				"codigo": "09"
+				"codigo": "09",
+				"orden": 1
 			}
 		},
 		{
@@ -34088,7 +34095,8 @@
 				"cod_ccaa": "07",
 				"provincia": "Salamanca",
 				"texto": "Salamanca",
-				"codigo": "37"
+				"codigo": "37",
+				"orden": 4
 			}
 		},
 		{
@@ -38511,7 +38519,8 @@
 				"cod_ccaa": "07",
 				"provincia": "Valladolid",
 				"texto": "Valladolid",
-				"codigo": "47"
+				"codigo": "47",
+				"orden": 7
 			}
 		}
 	]

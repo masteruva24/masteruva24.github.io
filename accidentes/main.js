@@ -1,172 +1,428 @@
-const rutaArchivoCSV = "accidentalidad.csv";
+const rutaArchivoCSV = "accidentalidad-por-carreteras.csv";
 
+//constantes de control de años
 const anioSeleccionado = document.getElementById("anio");
 const anio = anioSeleccionado.value;
+
+//constantes de control de provincias
 const provinciaSeleccionada = document.getElementById("provincia");
-const mapa = document.getElementById("mapa");
-const numeroTotal = document.getElementById("numero-total");
+
+//constantes para las gráficas
+//graficas de barras
+const canvasProvincias = document.getElementById("grafico-barras-provincias");
 //const graficoBarras = document.getElementById("grafico-barras");
-const ctx = document.getElementById("barras-provincias");
+const ctxAnio = document.getElementById("barras-provincias");
+const ctxTred = document.getElementById("barras-tred");
+//gráfica para el mapa
+const mapa = document.getElementById("mapa");
 
-/* ******* Datos de pruebas ******** */
+//variables para los accidentes
+const numeroTotal = document.getElementById("numero-total");
+const numeroHeridos = document.getElementById("numero-heridos");
+const numeroMuertos = document.getElementById("numero-muertos");
+const infoMostrada = document.getElementById("info-mostrada");
+const infoAnio = document.getElementById("info-anio");
+
+// inicializar variable de datos
+let datosAccidentes = {};
+
+
+/* ******* Arrays de etiquetas ******** */
+const provinciasPermitidas = ['AV', 'BU', 'LE', 'P', 'SA', 'SG', 'SO', 'VA', 'ZA'];
 const provincias = ["Ávila", "Burgos", "León", "Palencia", "Salamanca", "Segovia", "Soria", "Valladolid", "Zamora"];
-const accidentes2022 = [100, 200, 300, 400, 500, 600, 700, 800, 900];
-const accidentes2021 = [900, 800, 700, 600, 500, 400, 300, 200, 100];
-const accidentes2020 = [100, 100, 200, 200, 300, 300, 400, 400, 400];
-const accidentes2019 = [500, 500, 500, 500, 500, 500, 500, 500, 500];
-const accidentes2018 = [300, 300, 300, 300, 300, 300, 300, 300, 300];
-const accidentes2017 = [350, 450, 350, 560, 760, 460, 580, 300, 820];
-const accidentes2016 = [800, 800, 800, 800, 800, 800, 800, 300, 300];
-const datosAccidentes = {
-    "2022": [100, 200, 300, 400, 500, 600, 700, 800, 900],
-    "2021": [900, 800, 700, 600, 500, 400, 300, 200, 100],
-    "2020": [100, 100, 200, 200, 300, 300, 400, 400, 400],
-    "2019": [500, 500, 500, 500, 500, 500, 500, 500, 500],
-    "2018": [300, 300, 300, 300, 300, 300, 300, 300, 300],
-    "2017": [350, 450, 350, 560, 760, 460, 580, 300, 820],
-    "2016": [800, 800, 800, 800, 800, 800, 800, 300, 300]
-};
+const tred = ["CIP", "CL", "CP", "CTL"];
+
+/* ******* Arrays de inciales ******** */
+const provincias_ini = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+const tred_ini = [0, 0, 0, 0];
 
 
-/* ** Cambio de anño ** */
+
+
+/* ** Cambio de año ** */
 function cambiarAnio() {
-	//const select = document.getElementById("anio");
-	//const opcionSeleccionada = select.value;
-	console.log("Opción seleccionada:", anioSeleccionado.value);
 	pintarGrafica(anioSeleccionado.value);
+	pintarGraficaTred(anioSeleccionado.value);
 	mostrarTotalAccidentes(anioSeleccionado.value);
 }
 
+/* ** Cambio de provincia ** */
+function cambiarProvincia(){
+	let info = "Castilla y León";
+	if(provinciaSeleccionada.value == "all"){
+		canvasProvincias.style.display = "block";
+	} else {
+		canvasProvincias.style.display = "none";
+		info = provinciaSeleccionada.options[provinciaSeleccionada.selectedIndex].text;
+	}
+	pintarGraficaTred(anioSeleccionado.value);
+	mostrarTotalAccidentes(anioSeleccionado.value);
+	//cambiar texto
+	infoMostrada.textContent = info;
+}
 
+function transformarProvincia(prov){
+	let provincia = "SG";
+	switch (prov) {
+		case "Ávila":
+			provincia = "AV";
+			break;
+		case "Burgos":
+			provincia = "BU";
+			break;
+		case "León":
+			provincia = "LE";
+			break;
+		case "Palencia":
+			provincia = "P";
+			break;
+		case "Salamanca":
+			provincia = "SA";
+			break;
+		case "Segovia":
+			provincia = "SG";
+			break;
+		case "Soria":
+			provincia = "SO";
+			break;
+		case "Valladolid":
+			provincia = "VA";
+			break;
+		case "Zamora":
+			provincia = "ZA";
+			break;
+		default:
+			provincia = "SG";
+	}
+	return provincia;
+}
+
+function cambiarProvinciaMapa(d){
+	let provincia = transformarProvincia(d);
+	provinciaSeleccionada.value = provincia;
+	provinciaSeleccionada.dispatchEvent(new Event("change"));
+}
 
 /* Calculo del total */
 function mostrarTotalAccidentes(anio) {
-	const numeroTotalAccidentes = datosAccidentes[anio].reduce((acumulador, valorActual) => acumulador + valorActual, 0);
+	let numeroTotalAccidentes = datosAccidentes[anio]["total_accidentes"];
+	let numeroTotalHeridos = datosAccidentes[anio]["total_heridos"];
+	let numeroTotalMuertos = datosAccidentes[anio]["total_muertos"];
+	if(provinciaSeleccionada.value != "all"){
+		numeroTotalAccidentes = datosAccidentes[anio][provinciaSeleccionada.value]["accidentes"];
+		numeroTotalHeridos = datosAccidentes[anio][provinciaSeleccionada.value]["heridos"];
+		numeroTotalMuertos = datosAccidentes[anio][provinciaSeleccionada.value]["muertos"];
+	}
 	numeroTotal.textContent = numeroTotalAccidentes;
-	console.log("Total accidentes:", numeroTotalAccidentes);
+	numeroHeridos.textContent = numeroTotalHeridos;
+	numeroMuertos.textContent = numeroTotalMuertos;
+	infoAnio.textContent = anio;
 }
 
 
-/* **** Gráfico de Barras *********** */
+/* **** Gráfico de Barras de años *********** */
 function pintarGrafica(anio){
-	myChart.data.datasets[0].data = datosAccidentes[anio];
-	myChart.update('active');
+	ChartAnio.data.datasets[0].data = datosAccidentes[anio]["conjunto"];
+	/*  Solo se muestra una variable para no entorpecer la visión */
+	/*
+	ChartAnio.data.datasets[1].data = datosAccidentes[anio]["heridos"];
+	ChartAnio.data.datasets[2].data = datosAccidentes[anio]["muertos"];
+	*/
+	ChartAnio.update('active');
 }
 
-/* ** Definiciones iniciales ** */
-const data = {
-  labels: provincias,
-  datasets: [{
-    axis: 'y',
-    label: 'Accidentes',
-    data: datosAccidentes[anio],
-    fill: false,
-	/*
-    backgroundColor: [
-      'rgba(255, 99, 132, 0.2)',
-      'rgba(255, 159, 64, 0.2)',
-      'rgba(255, 205, 86, 0.2)',
-      'rgba(75, 192, 192, 0.2)',
-      'rgba(54, 162, 235, 0.2)',
-      'rgba(153, 102, 255, 0.2)',
-      'rgba(201, 203, 207, 0.2)'
-    ],
-    borderColor: [
-      'rgb(255, 99, 132)',
-      'rgb(255, 159, 64)',
-      'rgb(255, 205, 86)',
-      'rgb(75, 192, 192)',
-      'rgb(54, 162, 235)',
-      'rgb(153, 102, 255)',
-      'rgb(201, 203, 207)'
-    ],
-	*/
-    borderWidth: 1
-  }]
+/* **** Gráfico de Barras de tipos de red *********** */
+function pintarGraficaTred(anio){
+	let datosTred = datosAccidentes[anio]["TRED"];
+	if(provinciaSeleccionada.value != "all"){
+		datosTred = datosAccidentes[anio][provinciaSeleccionada.value]["TRED"];
+	}
+	ChartTred.data.datasets[0].data = Object.values(datosTred);
+	ChartTred.update('active');
+}
+
+/* ** Definiciones iniciales gráfico de barras distribución por provincias** */
+const dataAnio = {
+	labels: provincias,
+	datasets: [
+		{
+			axis: 'y',
+			label: 'Accidentes',
+			data: provincias_ini,
+			fill: false,
+			borderWidth: 1
+		}
+		/*  Solo se muestra una variable para no entorpecer la visión */
+		/*
+		,
+		{
+			axis: 'y',
+			label: 'Heridos',
+			data: provincias_ini,
+			fill: false,
+			borderWidth: 1
+		},
+		{
+			axis: 'y',
+			label: 'Muertos',
+			data: provincias_ini,
+			fill: false,
+			borderWidth: 1
+		}
+		*/
+	]
 };
-const config = {
+const configAnio = {
   type: 'bar',
-  data: data,
+  data: dataAnio,
   options: {
-    indexAxis: 'y',
-    // Elements options apply to all of the options unless overridden in a dataset
-    // In this case, we are setting the border of each horizontal bar to be 2px wide
-    elements: {
-      bar: {
-        borderWidth: 2,
-      }
-    },
-    responsive: true,
-    plugins: {
+	indexAxis: 'y',
+	elements: {
+	  bar: {
+		borderWidth: 2,
+	  }
+	},
+	responsive: true,
+	plugins: {
 		legend: false,
-      /*legend: {
-        position: 'right',
-      },*/
-      title: {
-        display: true,
-        text: 'Número de accidentes'
-      }
-    }
+		/*
+		legend: {
+			display: true,
+			position: 'right',
+		},*/
+		title: {
+			display: true,
+			text: 'Número de accidentes'
+		}
+	},
   },
 };
-const myChart = new Chart(ctx, config);
-myChart.update('active');
 
 
 
-/* **** Pruebas Mapa *********** */
+/* ** Definiciones iniciales para gráfica de barras de TRED ** */
+const dataTred = {
+  labels: tred,
+  datasets: [{
+	axis: 'y',
+	label: 'Tipo de vía',
+	data: tred_ini,
+	fill: false,
+	borderWidth: 1
+  }]
+};
+const configTred = {
+  type: 'bar',
+  data: dataTred,
+  options: {
+	indexAxis: 'y',
+	elements: {
+	  bar: {
+		borderWidth: 2,
+	  }
+	},
+	responsive: true,
+	plugins: {
+		legend: false,
+	  /*legend: {
+		position: 'right',
+	  },*/
+	  title: {
+		display: true,
+		text: 'Accidentes por tipo de vía'
+	  },
+	  
+      tooltip: {
+        callbacks: {
+          title: function(context) {
+            var labelMap = {
+              "CIP": "Carretera de Interés Regional",
+              "CL": "Carretera Local",
+              "CP": "Carretera Provincial",
+              "CTL": "Carretera de Interés Provincial"
+            };
+            return labelMap[context[0].label];
+          },
+		  label: function(context) {
+            return context.formattedValue;
+          }
+        }
+      }
+	  
+	}
+  }
+};
+const ChartAnio = new Chart(ctxAnio, configAnio);
+const ChartTred = new Chart(ctxTred, configTred);
+ChartAnio.update('active');
+ChartTred.update('active');
 
-// Carga del mapa
-// Carga el archivo geojson
-d3.json("provincias-CyL.geojson").then(function(data) {
-	const width = 800;
-	const height = 600;
 
-	// Crea una proyección geográfica
-	const projection = d3.geoMercator()
-		.fitSize([width, height], data);
+fetch(rutaArchivoCSV)
+	.then(response => response.text())
+	.then(data => {
+		let rows = data.split('\n');
+		let headers = rows[0].split(';');
 
-	const path = d3.geoPath().projection(projection);
+		for (let i = 1; i < rows.length; i++) {
+			if (rows[i].trim() === '') continue; // Si la línea está vacía, pasa a la siguiente
+			
+		  let row = rows[i].split(';');
+		  let provincia = row[headers.indexOf('NOMBRE')].split('-')[0];
 
-	// Crea el lienzo SVG
-	const svg = d3.select("#mapa")
-		.append("svg")
-		.attr("width", width)
-		.attr("height", height);
+		  if (provinciasPermitidas.includes(provincia)) {
+			let anio_fila = row[headers.indexOf('AÑO')];
+			let tred = row[headers.indexOf('T.RED')];
+			let accidentes = parseFloat(row[headers.indexOf('ASV')]) + parseFloat(row[headers.indexOf('ACV')]);
+			let heridos = parseFloat(row[headers.indexOf('HERIDOS')]);
+			let muertos = parseFloat(row[headers.indexOf('MUERTOS')]);
 
-	// Dibuja los elementos del mapa
-	svg.selectAll("path")
-		.data(data.features)
-		.enter()
-		.append("path")
-		.attr("d", path)
-		.style("fill", "lightblue")
-		.style("stroke", "white")
-		.style("stroke-width", 1);
-});
+			if (!datosAccidentes[anio_fila]) {
+			  datosAccidentes[anio_fila] = {
+				total_accidentes: 0,
+				total_heridos: 0,
+				total_muertos: 0,
+				TRED: {
+					"CIP": 0, 
+					"CL": 0, 
+					"CP": 0, 
+					"CTL": 0
+				},
+				conjunto: [],
+				heridos: [],
+				muertos: []
+			  };
+			}
 
+			datosAccidentes[anio_fila].total_accidentes += accidentes;
+			datosAccidentes[anio_fila].total_heridos += heridos;
+			datosAccidentes[anio_fila].total_muertos += muertos;
 
+			if (!datosAccidentes[anio_fila].TRED[tred]) {
+				datosAccidentes[anio_fila].TRED[tred] = 0;
+			}
 
+			datosAccidentes[anio_fila].TRED[tred]++;
 
+			if (!datosAccidentes[anio_fila][provincia]) {
+			  datosAccidentes[anio_fila][provincia] = {
+				accidentes: 0,
+				heridos: 0,
+				muertos: 0,
+				TRED: {
+					"CIP": 0, 
+					"CL": 0, 
+					"CP": 0, 
+					"CTL": 0
+				}
+			  };
+			}
 
-//const svg = d3.select(mapa).append("svg");
-//const path = svg.selectAll("path").data("provincias-CyL.geojson");
-/*
-async function loadEspanaData() {
-  const response = await fetch("espana.json");
-  const data = await response.json();
-  return data;
-}
+			datosAccidentes[anio_fila][provincia].accidentes += accidentes;
+			datosAccidentes[anio_fila][provincia].heridos += heridos;
+			datosAccidentes[anio_fila][provincia].muertos += muertos;
 
-loadEspanaData().then(espana => {
-  // Use the 'espana' object for map creation
-  const svg = d3.select(mapa).append("svg");
-  const path = svg.selectAll("path").data(topojson.feature(espana, espana.provincias).features);
-  // ... rest of your code using espana
-});
-*/
+			if (!datosAccidentes[anio_fila][provincia].TRED[tred]) {
+			  datosAccidentes[anio_fila][provincia].TRED[tred] = 0;
+			}
 
+			datosAccidentes[anio_fila][provincia].TRED[tred]++;
+		  }
+		}
 
-/* **** Llamadas a funciones iniciales  ***** */
-console.log("Año inicial:", anio);
-mostrarTotalAccidentes(anio)
+		for (let anio_fila in datosAccidentes) {
+		  for (let provincia of provinciasPermitidas) {
+			if (datosAccidentes[anio_fila][provincia]) {
+			  datosAccidentes[anio_fila].conjunto.push(datosAccidentes[anio_fila][provincia].accidentes);
+			  datosAccidentes[anio_fila].heridos.push(datosAccidentes[anio_fila][provincia].heridos);
+			  datosAccidentes[anio_fila].muertos.push(datosAccidentes[anio_fila][provincia].muertos);
+			}
+		  }
+		}
+
+		//con los datos del csv cargados pasamos a crear los gráficos
+		
+		// Carga del mapa a partir del archivo geojson
+		function crearMapa(anio){
+			// Limpia el mapa existente
+			d3.select("#mapa").selectAll("*").remove();
+	
+			//creamos el mapa
+			d3.json("provincias-CyL.geojson").then(function(geoData) {
+				const width = 800;
+				const height = 600;
+
+				// Crea una proyección geográfica
+				const projection = d3.geoMercator()
+					.fitSize([width, height], geoData);
+
+				const path = d3.geoPath().projection(projection);
+
+				// Crea el lienzo SVG
+				const svg = d3.select("#mapa")
+					.append("svg")
+					.attr("width", width)
+					.attr("height", height);
+					
+
+				var tooltip = d3.select("body")
+				.append("div")
+				.style("position", "absolute")
+				.style("z-index", "10")
+				.style("visibility", "hidden")
+				.style("background", "#f0f0f0")
+				.style("width", "130px")
+				.style("height", "105px")
+				.style("border-radius", "5px")
+				.style("padding", "5px")
+				.style("text-align", "left")
+				.text("");
+			  
+				// Define una escala de colores
+				const colorScale = d3.scaleLinear()
+				  .domain([d3.min(datosAccidentes[anio]["conjunto"]), d3.max(datosAccidentes[anio]["conjunto"])])
+				  .range(["lightblue", "darkblue"]);
+
+				// Dibuja los elementos del mapa
+				svg.selectAll("path")
+					.data(geoData.features)
+					.enter()
+					.append("path")
+					.attr("d", path)
+					.attr("fill", function(d) {
+						return colorScale(datosAccidentes[anio]["conjunto"][d.properties.orden]);
+					})
+					.style("stroke", "black")
+					.style("stroke-width", 1)
+					.on("mouseover", function(d) {
+						let provincia = transformarProvincia(d.target.__data__.properties.provincia);
+						tooltip.html(`<p id="titulo-tooltip">${d.target.__data__.properties.provincia}: </p>
+						<p>Accidentes: ${datosAccidentes[anio][provincia]["accidentes"]}
+						Heridos: ${datosAccidentes[anio][provincia]["heridos"]}
+						Muertos: ${datosAccidentes[anio][provincia]["muertos"]}</p>`)
+						  .style("visibility", "visible")
+						  .style("left", `${d.pageX}px`)
+						  .style("top", `${d.pageY}px`);
+					})
+					.on("mouseout", function() {
+						tooltip.style("visibility", "hidden");
+					})
+					.on("click", function(d) {
+						cambiarProvinciaMapa(d.target.__data__.properties.provincia);
+					});
+			});
+		}
+
+		/* **** Llamadas a funciones iniciales  ***** */
+		console.log(datosAccidentes);
+		crearMapa(anio);
+		mostrarTotalAccidentes(anio)
+		cambiarAnio();
+		// listener para cambio de mapa
+		anioSeleccionado.addEventListener("change", function() {
+			var nuevoAnio = anioSeleccionado.value;
+			// Llama a la función para actualizar el mapa
+			crearMapa(nuevoAnio);
+		});
+		
+	});
