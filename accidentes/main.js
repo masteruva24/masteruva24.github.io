@@ -399,7 +399,7 @@ fetch(rutaArchivoCSV)
 						tooltip.html(`<p id="titulo-tooltip">${d.target.__data__.properties.provincia}: </p>
 						<p>Accidentes: ${datosAccidentes[anio][provincia]["accidentes"]}
 						Heridos: ${datosAccidentes[anio][provincia]["heridos"]}
-						Muertos: ${datosAccidentes[anio][provincia]["muertos"]}</p>`)
+						Fallecidos: ${datosAccidentes[anio][provincia]["muertos"]}</p>`)
 						  .style("visibility", "visible")
 						  .style("left", `${d.pageX}px`)
 						  .style("top", `${d.pageY}px`);

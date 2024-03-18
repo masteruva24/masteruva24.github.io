@@ -54,12 +54,6 @@ footer {
     padding: 20px;
 }
 
-#numero-total {
-	text-align: center;
-	font-size: 24px;
-	margin-bottom: 10px;
-}
-
 #grafico-barras-provincias {
 	width: 100%;
 	flex-grow: 1;
