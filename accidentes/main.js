@@ -224,9 +224,6 @@ const configTred = {
 	responsive: true,
 	plugins: {
 		legend: false,
-	  /*legend: {
-		position: 'right',
-	  },*/
 	  title: {
 		display: true,
 		text: 'Accidentes por tipo de vía'
@@ -361,8 +358,8 @@ fetch(rutaArchivoCSV)
 				// Crea el lienzo SVG
 				const svg = d3.select("#mapa")
 					.append("svg")
-					.attr("width", width)
-					.attr("height", height);
+					.attr("viewBox", `0 0 ${width} ${height}`)
+					.attr("preserveAspectRatio", "xMidYMid meet");
 					
 
 				var tooltip = d3.select("body")

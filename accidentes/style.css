@@ -71,10 +71,7 @@ footer {
 
 /* leyenda mapa*/
 #leyenda {
-  position: relative;
-  top: -150px;
-  left: 500px;
-  padding: 10px;
+	
 }
 
 #leyenda-valores span{
