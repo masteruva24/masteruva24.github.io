@@ -68,3 +68,24 @@ footer {
 #titulo-tooltip{
 	font-weight: bold;
 }
+
+/* leyenda mapa*/
+#leyenda {
+  position: relative;
+  top: -150px;
+  left: 500px;
+  padding: 10px;
+}
+
+#leyenda-valores span{
+  width: 45px;
+  height: 10px;
+  display: inline-block;
+}
+
+#leyenda-colores span{
+
+  width: 45px;
+  height: 10px;
+  display: inline-block;
+}

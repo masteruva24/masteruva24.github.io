@@ -382,6 +382,22 @@ fetch(rutaArchivoCSV)
 				const colorScale = d3.scaleLinear()
 				  .domain([d3.min(datosAccidentes[anio]["conjunto"]), d3.max(datosAccidentes[anio]["conjunto"])])
 				  .range(["lightblue", "darkblue"]);
+				  
+				//mostramos la leyenda
+				const min = d3.min(datosAccidentes[anio]["conjunto"]);
+				const max = d3.max(datosAccidentes[anio]["conjunto"]);
+				const vari = (max - min) / 5;
+				const leyendaValores = d3.select("#leyenda-valores");
+				leyendaValores.selectAll("span").remove();
+				const leyendaColores = d3.select("#leyenda-colores");
+				leyendaColores.selectAll("span").remove();
+				for (let i = min; i <= max; i+= vari) {
+					leyendaValores.append("span")
+					.text(` ${Math.floor(i)}  `);
+					leyendaColores.append("span")
+					.style("background-color", colorScale(i))
+					.text(" ");
+				}
 
 				// Dibuja los elementos del mapa
 				svg.selectAll("path")
@@ -414,7 +430,6 @@ fetch(rutaArchivoCSV)
 		}
 
 		/* **** Llamadas a funciones iniciales  ***** */
-		console.log(datosAccidentes);
 		crearMapa(anio);
 		mostrarTotalAccidentes(anio)
 		cambiarAnio();
